@@ -1,53 +1,50 @@
-
-function fig = plot_thermal(data, thermal, cfg)
-% ПОБУДОВА ГРАФІКІВ ТЕПЛОВОГО СТАНУ
+function fig = plot_thermal(data,thermal,cfg)
+% ГРАФІКИ НЕЛІНІЙНОЇ ТЕПЛОВОЇ МОДЕЛІ
 
 t = data.tH;
+fig = figure('Name','Нелінійна теплова модель','Color','w');
 
-fig = figure('Name','Тепловий стан','Color','w');
-
-%% Температура масла та гарячої точки
-
-subplot(2,1,1);
-
+%% Температури
+subplot(3,1,1);
 plot(t,thermal.topOilC,'LineWidth',1.8);
 hold on;
-
 plot(t,data.oilTempSensorC,'LineWidth',1.2);
 plot(t,thermal.hotSpotC,'LineWidth',1.6);
-
 grid on;
-
 xlabel('Час, год');
 ylabel('Температура, °C');
 title('Температурний режим трансформатора');
-
 legend('Розрахункова температура масла', ...
        'Виміряна температура масла', ...
-       'Температура гарячої точки', ...
+       'Розрахункова гаряча точка', ...
        'Location','best');
 
-%% Відхилення температури від моделі
-
-subplot(2,1,2);
-
+%% Відхилення температури
+subplot(3,1,2);
 plot(t,thermal.residualC,'LineWidth',1.6);
 hold on;
-
 limit = cfg.limits.thermalResidualC;
-
 plot(t,limit*ones(size(t)),'--');
 plot(t,-limit*ones(size(t)),'--');
-
 grid on;
-
 xlabel('Час, год');
 ylabel('Відхилення, °C');
-title('Відхилення виміряної температури від розрахункової');
-
+title('Виміряна температура мінус розрахункова');
 legend('Відхилення температури', ...
        'Верхня умовна межа', ...
        'Нижня умовна межа', ...
        'Location','best');
 
+%% В'язкість
+subplot(3,1,3);
+plot(t,thermal.viscosityRelative,'LineWidth',1.6);
+hold on;
+plot(t,thermal.measuredViscosityRelative,'LineWidth',1.2);
+grid on;
+xlabel('Час, год');
+ylabel('Відносна в’язкість');
+title('Зміна в’язкості масла');
+legend('За розрахунковою температурою', ...
+       'За показанням датчика', ...
+       'Location','best');
 end
