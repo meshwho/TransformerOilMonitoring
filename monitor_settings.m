@@ -26,10 +26,18 @@ cfg.thermal.k21 = 1.3;
 cfg.thermal.k22 = 2;
 cfg.thermal.tauWindingH = 0.12;
 
-%% Модель вологості
-cfg.moisture.satAtRefPPM = 85;
-cfg.moisture.refTempC = 40;
-cfg.moisture.betaPerC = 0.028;
+%% Модель вологовмісту (формули 3.4-3.8)
+% Параметри розчинності для одного зразка мінерального масла
+% з таблиці II CIGRE 349. Для іншого масла їх потрібно калібрувати.
+cfg.moisture.solubilityC0PPM = 16.97e6;  % мг/кг
+cfg.moisture.solubilityBK = 3777;        % К
+
+% Часові інтервали, год
+cfg.moisture.averageWindowH = 24;
+cfg.moisture.dailyLagH = 24;
+
+% Умовна стандартна похибка датчика активності води
+cfg.moisture.sensorNoiseAw = 0.001;
 
 %% Аналіз газів
 cfg.dga.rateWindowH = 4;

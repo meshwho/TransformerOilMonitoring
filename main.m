@@ -66,6 +66,26 @@ fprintf('Вміст води: %.2f мг/кг\n', ...
 fprintf('Відносне насичення водою: %.2f %%\n', ...
     moisture.relativeSaturationPct(end));
 
+fprintf('Активність води: %.4f\n', ...
+    moisture.waterActivity(end));
+
+fprintf('Розчинність води: %.2f мг/кг\n', ...
+    moisture.saturationPPM(end));
+
+if isfinite(moisture.average24PPM(end))
+    fprintf('Середній вологовміст за 24 год: %.2f мг/кг\n', ...
+        moisture.average24PPM(end));
+else
+    fprintf('Середній вологовміст: ще немає 24 год даних\n');
+end
+
+if isfinite(moisture.dailyChangePPMperDay(end))
+    fprintf('Добова зміна вологовмісту: %+.2f мг/кг за добу\n', ...
+        moisture.dailyChangePPMperDay(end));
+else
+    fprintf('Добова зміна: ще немає 48 год даних\n');
+end
+
 fprintf('Концентрація водню: %.2f ppm\n', ...
     data.h2PPM(end));
 

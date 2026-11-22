@@ -1,40 +1,92 @@
+function out = model_moisture(data,cfg)
+% МАТЕМАТИЧНА МОДЕЛЬ ВОЛОГОВМІСТУ МАСЛА
+% 3.4: RS = 100*aw
+% 3.5: Csat = C0*exp(-B/Tk)
+% 3.6: Cw = aw*Csat
+% 3.7: Середній вологовміст за 24 години
+% 3.8: Різниця двох добових середніх
 
-function out = model_moisture(data, cfg)
-% МАТЕМАТИЧНА МОДЕЛЬ ВОЛОГОВМІСТУ
-%
-% Розрахунок розчинності води та
-% відносного насичення масла вологою.
+%% Вхідні показання датчика
 
-T = data.oilTempSensorC;
-waterPPM = data.waterPPM;
+t = data.tH(:);
+T = data.oilTempSensorC(:);
+aw = data.waterActivity(:);
+N = numel(t);
 
-%% Розчинність води залежно від температури
+if N < 2 || numel(T) ~= N || numel(aw) ~= N
+    error('Час, температура та активність води мають різну довжину.');
+end
 
-Csat = cfg.moisture.satAtRefPPM .* ...
-    exp(cfg.moisture.betaPerC .* ...
-    (T - cfg.moisture.refTempC));
+if any(~isfinite([t;T;aw])) || any(diff(t) <= 0)
+    error('Некоректні показання датчиків або час вимірювань.');
+end
 
-%% Відносне насичення водою, %
+if any(aw < 0 | aw > 1)
+    error('Активність води повинна бути в межах від 0 до 1.');
+end
 
-RS = 100 .* waterPPM ./ Csat;
+%% Розрахунок за формулами 3.4-3.6
 
-%% Перевірка допустимих значень
+relativeSaturationPct = 100*aw;
+saturationPPM = water_solubility(T,cfg);
+waterPPM = aw.*saturationPPM;
+
+%% Визначення кількості вимірювань у часових інтервалах
+
+dt = median(diff(t));
+
+if any(abs(diff(t)-dt) > 1e-6*dt)
+    error('Для ковзного середнього потрібен рівномірний крок часу.');
+end
+
+avgRatio = cfg.moisture.averageWindowH/dt;
+lagRatio = cfg.moisture.dailyLagH/dt;
+avgSamples = round(avgRatio);
+lagSamples = round(lagRatio);
+
+if avgSamples < 1 || lagSamples < 1 || ...
+        abs(avgRatio-avgSamples) > 1e-6 || ...
+        abs(lagRatio-lagSamples) > 1e-6
+    error('Інтервали усереднення мають містити ціле число кроків.');
+end
+
+%% Ковзне середнє за повні 24 години, формула 3.7
+% До завершення першої доби значення ще недоступне.
+
+average24PPM = nan(N,1);
+
+for k = avgSamples+1:N
+    average24PPM(k) = mean(waterPPM(k-avgSamples+1:k));
+end
+
+%% Добова зміна, формула 3.8
+% Порівнюємо два повні добові середні.
+% Перший результат з'явиться після 48 годин.
+
+dailyChangePPMperDay = nan(N,1);
+
+for k = avgSamples+lagSamples+1:N
+    dailyChangePPMperDay(k) = ...
+        average24PPM(k)-average24PPM(k-lagSamples);
+end
+
+%% Діагностичні попередження за поточними показаннями
+% Межі умовні; добова зміна є додатковою інформацією.
 
 highWater = waterPPM > cfg.limits.waterPPM;
-
-highSaturation = RS > ...
+highSaturation = relativeSaturationPct > ...
     cfg.limits.relativeSaturationPct;
-
-warning = highWater | highSaturation;
 
 %% Результати
 
+out.waterActivity = aw;
 out.waterPPM = waterPPM;
-out.saturationPPM = Csat;
-out.relativeSaturationPct = RS;
-
+out.saturationPPM = saturationPPM;
+out.relativeSaturationPct = relativeSaturationPct;
+out.average24PPM = average24PPM;
+out.dailyChangePPMperDay = dailyChangePPM;
 out.highWater = highWater;
 out.highSaturation = highSaturation;
-out.warning = warning;
+out.warning = highWater | highSaturation;
 
 end

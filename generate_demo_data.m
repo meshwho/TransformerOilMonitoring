@@ -33,10 +33,19 @@ end
 realThermal = model_thermal(baseData,realCfg);
 oilTempC = realThermal.topOilC+0.25*randn(N,1);
 
-%% Вода
-waterPPM = 14+0.05*t ...
-    +moistureFault*2.1*max(t-46,0)+0.25*randn(N,1);
-waterPPM = max(waterPPM,0);
+%% Умовний датчик активності води
+% Лише для створення синтетичних вимірювань задаємо сценарій ppm.
+% Модель моніторингу не отримує ці приховані значення.
+waterTargetPPM = 14+0.05*t ...
+    +moistureFault*2.1*max(t-46,0);
+
+% Перетворення умовного вологовмісту в сигнал датчика aw.
+waterSaturationPPM = water_solubility(oilTempC,cfg);
+waterActivity = waterTargetPPM./waterSaturationPPM ...
+    +cfg.moisture.sensorNoiseAw*randn(N,1);
+
+% Діапазон активності води для ненасиченого масла.
+waterActivity = min(max(waterActivity,0),0.999);
 
 %% Розчинені гази
 h2 = 35+0.06*t+gasFault*3.3*max(t-50,0)+0.25*randn(N,1);
@@ -52,7 +61,7 @@ data.tH = t;
 data.loadPU = loadPU;
 data.ambientC = ambientC;
 data.oilTempSensorC = oilTempC;
-data.waterPPM = waterPPM;
+data.waterActivity = waterActivity;
 data.h2PPM = max(h2,0);
 data.ch4PPM = max(ch4,0);
 data.c2h6PPM = max(c2h6,0);
