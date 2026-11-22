@@ -63,10 +63,10 @@ end
 % Порівнюємо два повні добові середні.
 % Перший результат з'явиться після 48 годин.
 
-dailyChangePPMperDay = nan(N,1);
+dailyChangePPM = nan(N,1);
 
 for k = avgSamples+lagSamples+1:N
-    dailyChangePPMperDay(k) = ...
+    dailyChangePPM(k) = ...
         average24PPM(k)-average24PPM(k-lagSamples);
 end
 
