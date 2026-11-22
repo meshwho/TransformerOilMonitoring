@@ -86,11 +86,48 @@ else
     fprintf('Добова зміна: ще немає 48 год даних\n');
 end
 
+fprintf('\nГАЗОВИЙ АНАЛІЗ (DGA)\n');
+fprintf('----------------------------------------\n');
 fprintf('Концентрація водню: %.2f ppm\n', ...
     data.h2PPM(end));
+fprintf('TDCG: %.2f ppm\n',dga.TDCG(end));
 
-fprintf('Швидкість накопичення H2: %.2f ppm/год\n\n', ...
-    dga.h2RatePPMperH(end));
+if isfinite(dga.averageTDCGPPM(end))
+    fprintf('Середнє TDCG за 24 год: %.2f ppm\n', ...
+        dga.averageTDCGPPM(end));
+end
+
+if isfinite(dga.dailyChangeTDCGPPM(end))
+    fprintf('Добова зміна TDCG: %+.2f ppm\n', ...
+        dga.dailyChangeTDCGPPM(end));
+    fprintf('Швидкість зміни H2: %+.2f ppm/год\n', ...
+        dga.h2RatePPMperH(end));
+else
+    fprintf('Добова зміна: ще немає 48 год даних\n');
+end
+
+fprintf('Відношення CH4/H2: ');
+if isfinite(dga.ratioCH4H2(end))
+    fprintf('%.3f\n',dga.ratioCH4H2(end));
+else
+    fprintf('недостатньо достовірних даних\n');
+end
+
+fprintf('Відношення C2H2/C2H4: ');
+if isfinite(dga.ratioC2H2C2H4(end))
+    fprintf('%.3f\n',dga.ratioC2H2C2H4(end));
+else
+    fprintf('недостатньо достовірних даних\n');
+end
+
+fprintf('Відношення C2H4/C2H6: ');
+if isfinite(dga.ratioC2H4C2H6(end))
+    fprintf('%.3f\n',dga.ratioC2H4C2H6(end));
+else
+    fprintf('недостатньо достовірних даних\n');
+end
+
+fprintf('Попередження DGA: %d\n\n',dga.warning(end));
 
 
 %% Температурно-залежні властивості масла

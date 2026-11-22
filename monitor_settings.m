@@ -53,16 +53,27 @@ cfg.moisture.averageWindowH = 24;
 cfg.moisture.dailyLagH = 24;
 cfg.moisture.sensorNoiseAw = 0.001;
 
-%% Аналіз газів
-cfg.dga.rateWindowH = 4;
-cfg.dga.smoothSamples = 5;
+%% Аналіз газів: обробка показань онлайн-аналізатора
+% Типовий демонстраційний цикл вимірювання 1,5 години.
+cfg.dga.measurementIntervalH = 1.5;
+cfg.dga.averageWindowH = 24;        % Добове середнє, год
+cfg.dga.dailyLagH = 24;             % Порівняння з попередньою добою, год
+cfg.dga.minReliableSamples = 5;     % Мінімум вимірювань для середнього
+% Умовні мінімальні концентрації для розрахунку газових відношень, ppm_v.
+% Порядок: H2, CH4, C2H6, C2H4, C2H2, CO, CO2.
+cfg.dga.ratioMinimumPPM = [5 5 5 5 1 20 100];
 
 %% Демонстраційні пороги, не нормативні значення
 cfg.limits.thermalResidualC = 5;
 cfg.limits.waterPPM = 35;
 cfg.limits.relativeSaturationPct = 30;
-cfg.limits.h2RatePPMperH = 1.5;
+cfg.limits.h2RatePPMperH = 1.0;
 cfg.limits.c2h2PPM = 3;
+% Умовні межі середніх концентрацій і швидкостей їх зміни.
+% Порядок: H2, CH4, C2H6, C2H4, C2H2, CO, CO2.
+cfg.limits.dgaConcentrationPPM = [70 40 20 25 3 250 5000];
+cfg.limits.dgaRatePPMperH = [cfg.limits.h2RatePPMperH ...
+    0.35 0.20 0.40 0.08 0.70 2.0];
 
 %% Оцінювання якості масла
 cfg.oilQuality.acidMax = 0.10;

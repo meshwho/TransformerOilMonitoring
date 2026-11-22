@@ -47,14 +47,38 @@ waterActivity = waterTruePPM./waterSaturationPPM ...
 
 waterActivity = min(max(waterActivity,0),0.999);
 
-%% Розчинені гази
-h2 = 35+0.06*t+gasFault*3.3*max(t-50,0)+0.25*randn(N,1);
-ch4 = 10+0.025*t+gasFault*1.0*max(t-50,0);
-c2h6 = 4+0.01*t+gasFault*0.5*max(t-50,0);
-c2h4 = 5+0.02*t+gasFault*1.2*max(t-50,0);
-c2h2 = 0.2+gasFault*0.35*max(t-60,0);
-co = 180+0.1*t+gasFault*2.5*max(t-55,0);
-co2 = 1800+t+gasFault*6.0*max(t-55,0);
+%% Синтетичні вимірювання онлайн-газоаналізатора
+% 1,5 год між вимірюваннями. Вхідні концентрації задані умовно,
+% без моделювання хімічного газоутворення в трансформаторі.
+samplingRatio = cfg.dga.measurementIntervalH/cfg.dtH;
+samplingStep = round(samplingRatio);
+if samplingStep < 1 || abs(samplingRatio-samplingStep) > 1e-8
+    error('Крок газоаналізатора має бути кратним часовому кроку.');
+end
+
+gasMeasurementMask = false(N,1);
+gasMeasurementMask(1:samplingStep:end) = true;
+tGas = t(gasMeasurementMask);
+ramp = gasFault*max(tGas-50,0);
+
+% Умовний фоновий газовий склад і його зміна після 50-ї години.
+gasReadings = [35+0.06*tGas+3.3*ramp, ...
+               10+0.025*tGas+1.0*ramp, ...
+               4+0.01*tGas+0.5*ramp, ...
+               5+0.02*tGas+1.2*ramp, ...
+               0.2+gasFault*0.35*max(tGas-60,0), ...
+               180+0.1*tGas+gasFault*2.5*max(tGas-55,0), ...
+               1800+tGas+gasFault*6.0*max(tGas-55,0)];
+
+% Невеликий умовний шум кожного вимірювання.
+sensorNoise = [0.4 0.2 0.10 0.15 0.02 1.2 4];
+gasReadings = max(gasReadings + ...
+    bsxfun(@times,randn(numel(tGas),7),sensorNoise),0);
+
+% На сітці 15 хв утримується останнє показання газоаналізатора.
+% Воно не вважається новим вимірюванням у розрахунку середнього.
+lastGasIndex = floor(((1:N)'-1)/samplingStep)+1;
+gasHeld = gasReadings(lastGasIndex,:);
 
 %% Формування вимірювань
 data.tH = t;
@@ -62,13 +86,14 @@ data.loadPU = loadPU;
 data.ambientC = ambientC;
 data.oilTempSensorC = oilTempC;
 data.waterActivity = waterActivity;
-data.h2PPM = max(h2,0);
-data.ch4PPM = max(ch4,0);
-data.c2h6PPM = max(c2h6,0);
-data.c2h4PPM = max(c2h4,0);
-data.c2h2PPM = max(c2h2,0);
-data.coPPM = max(co,0);
-data.co2PPM = max(co2,0);
+data.dgaMeasurementMask = gasMeasurementMask;
+data.h2PPM = gasHeld(:,1);
+data.ch4PPM = gasHeld(:,2);
+data.c2h6PPM = gasHeld(:,3);
+data.c2h4PPM = gasHeld(:,4);
+data.c2h2PPM = gasHeld(:,5);
+data.coPPM = gasHeld(:,6);
+data.co2PPM = gasHeld(:,7);
 
 %% Лабораторні показники (три окремі аналізи за шість місяців)
 data.lab.month = [-6; -3; 0];

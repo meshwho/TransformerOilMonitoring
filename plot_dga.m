@@ -1,76 +1,51 @@
+function fig = plot_dga(data,dga,cfg)
+% ГРАФІКИ ОБРОБКИ ПОКАЗАНЬ ОНЛАЙН-ГАЗОАНАЛІЗАТОРА
 
-function fig = plot_dga(data, dga, cfg)
-% ПОБУДОВА ГРАФІКІВ АНАЛІЗУ РОЗЧИНЕНИХ ГАЗІВ
+t = data.tH(:);
+fig = figure('Name','Газовий аналіз','Color','w', ...
+    'Position',[100 80 900 700]);
 
-t = data.tH;
-
-fig = figure('Name','Газовий аналіз','Color','w');
-
-%% Концентрації водню та вуглеводневих газів
-
+%% Виміряні концентрації основних газів
 subplot(3,1,1);
-
 plot(t,data.h2PPM,'LineWidth',1.5);
 hold on;
-
 plot(t,data.ch4PPM,'LineWidth',1.4);
 plot(t,data.c2h6PPM,'LineWidth',1.4);
 plot(t,data.c2h4PPM,'LineWidth',1.4);
 plot(t,data.c2h2PPM,'LineWidth',1.4);
-
 grid on;
-
 xlabel('Час, год');
 ylabel('Концентрація, ppm');
-title('Концентрації розчинених газів');
-
-legend('Водень (H₂)', ...
-       'Метан (CH₄)', ...
-       'Етан (C₂H₆)', ...
-       'Етилен (C₂H₄)', ...
-       'Ацетилен (C₂H₂)', ...
+title('Показання газоаналізатора');
+legend('Водень (H₂)','Метан (CH₄)','Етан (C₂H₆)', ...
+       'Етилен (C₂H₄)','Ацетилен (C₂H₂)', ...
        'Location','best');
 
-%% Концентрації оксидів вуглецю
-
+%% Загальна концентрація горючих газів
 subplot(3,1,2);
-
-plot(t,data.coPPM,'LineWidth',1.5);
+plot(t,dga.TDCG,'LineWidth',1.3);
 hold on;
-
-plot(t,data.co2PPM,'LineWidth',1.5);
-
+plot(t,dga.averageTDCGPPM,'LineWidth',1.8);
 grid on;
-
 xlabel('Час, год');
-ylabel('Концентрація, ppm');
-title('Концентрації оксидів вуглецю');
-
-legend('Монооксид вуглецю (CO)', ...
-       'Діоксид вуглецю (CO₂)', ...
+ylabel('TDCG, ppm');
+title('Сумарна концентрація горючих газів');
+legend('За показаннями','Середнє за 24 години', ...
        'Location','best');
 
-%% Швидкість накопичення водню
-
+%% Швидкість зміни усередненої концентрації водню
 subplot(3,1,3);
-
 plot(t,dga.h2RatePPMperH,'LineWidth',1.6);
 hold on;
-
-limit = cfg.limits.h2RatePPMperH;
-plot(t,limit*ones(size(t)),'--');
-
+plot(t,cfg.limits.h2RatePPMperH*ones(size(t)),'--');
+plot(t,zeros(size(t)),':');
 grid on;
-
 xlabel('Час, год');
-ylabel('Швидкість, ppm/год');
-title('Швидкість накопичення водню');
-
-legend('Швидкість накопичення H₂', ...
-       'Умовна межа', ...
+ylabel('Зміна H₂, ppm/год');
+title('Швидкість зміни концентрації водню за добу');
+legend('Швидкість зміни','Умовна межа','Нульова зміна', ...
        'Location','best');
 
-%% Межі осі часу: від першого до останнього вимірювання
 format_time_axes(fig,t,7);
 
 end
