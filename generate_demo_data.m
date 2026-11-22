@@ -40,7 +40,8 @@ waterTruePPM = simulate_moisture_exchange(t,realThermal,cfg,moistureFault);
 
 % Імітація датчика: активність води та температура вимірювання.
 % Температурна розчинність впливає на показання aw.
-waterSaturationPPM = water_solubility(oilTempC,cfg);
+% Сигнал aw відповідає фізичній температурі; датчик T має власну похибку.
+waterSaturationPPM = water_solubility(realThermal.topOilC,cfg);
 waterActivity = waterTruePPM./waterSaturationPPM ...
     +cfg.moisture.sensorNoiseAw*randn(N,1);
 

@@ -2,7 +2,8 @@ function fig = plot_moisture(data,moisture,cfg)
 % ГРАФІКИ ТЕМПЕРАТУРИ ТА ВОЛОГОВМІСТУ МАСЛА
 
 t = data.tH;
-fig = figure('Name','Вологовміст масла','Color','w');
+fig = figure('Name','Вологовміст масла','Color','w', ...
+    'Position',[100 80 900 780]);
 
 %% Температура масла
 subplot(4,1,1);
