@@ -27,16 +27,30 @@ cfg.thermal.k22 = 2;
 cfg.thermal.tauWindingH = 0.12;
 
 %% Модель вологовмісту (формули 3.4-3.8)
-% Параметри розчинності для одного зразка мінерального масла
-% з таблиці II CIGRE 349. Для іншого масла їх потрібно калібрувати.
+% Розчинність для одного зразка мінерального масла, CIGRE 349.
 cfg.moisture.solubilityC0PPM = 16.97e6;  % мг/кг
 cfg.moisture.solubilityBK = 3777;        % К
 
-% Часові інтервали, год
+% Умовний трансформатор та початковий стан
+cfg.moisture.oilMassKg = 10000;          % Маса масла, кг
+cfg.moisture.paperMassKg = 1000;         % Маса сухої целюлози, кг
+cfg.moisture.initialOilPPM = 16;         % Початковий вміст води, мг/кг
+cfg.moisture.initialPaperWaterPct = 2;   % Частка води від сухої маси паперу, %
+
+% Наближена динаміка обміну вологою між маслом і целюлозою
+% Параметри умовні; потрібна калібровка за вимірюваннями.
+cfg.moisture.paperTemperatureFactor = 0.25;
+cfg.moisture.paperSorptionExponent = 2;
+cfg.moisture.desorptionTauH = 4;         % Віддача води папером, год
+cfg.moisture.absorptionTauH = 12;        % Поглинання води папером, год
+
+% Додаткове надходження води при порушенні герметичності (сценарії 3 і 5)
+cfg.moisture.ingressStartH = 46;         % Початок несправності, год
+cfg.moisture.ingressGperH = 15;          % Умовний сильний витік, г/год
+
+% Обробка показань та умовний шум датчика
 cfg.moisture.averageWindowH = 24;
 cfg.moisture.dailyLagH = 24;
-
-% Умовна стандартна похибка датчика активності води
 cfg.moisture.sensorNoiseAw = 0.001;
 
 %% Аналіз газів

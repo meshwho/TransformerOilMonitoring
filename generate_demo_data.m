@@ -33,18 +33,17 @@ end
 realThermal = model_thermal(baseData,realCfg);
 oilTempC = realThermal.topOilC+0.25*randn(N,1);
 
-%% Умовний датчик активності води
-% Лише для створення синтетичних вимірювань задаємо сценарій ppm.
-% Модель моніторингу не отримує ці приховані значення.
-waterTargetPPM = 14+0.05*t ...
-    +moistureFault*2.1*max(t-46,0);
+%% Синтетичні показання датчика активності води
+% Фізична динаміка враховує тепловий режим і обмін з папером.
+% Лише генератор знає про початкову вологість паперової ізоляції.
+waterTruePPM = simulate_moisture_exchange(t,realThermal,cfg,moistureFault);
 
-% Перетворення умовного вологовмісту в сигнал датчика aw.
+% Імітація датчика: активність води та температура вимірювання.
+% Температурна розчинність впливає на показання aw.
 waterSaturationPPM = water_solubility(oilTempC,cfg);
-waterActivity = waterTargetPPM./waterSaturationPPM ...
+waterActivity = waterTruePPM./waterSaturationPPM ...
     +cfg.moisture.sensorNoiseAw*randn(N,1);
 
-% Діапазон активності води для ненасиченого масла.
 waterActivity = min(max(waterActivity,0),0.999);
 
 %% Розчинені гази
