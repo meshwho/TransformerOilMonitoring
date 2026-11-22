@@ -36,4 +36,10 @@ legend('Показники масла', ...
 
 grid on;
 
+% Запас над стовпчиками та діагностичною межею.
+ax = gca;
+limits = ylim(ax);
+margin = 0.08*(limits(2)-limits(1));
+ylim(ax,[limits(1),limits(2)+margin]);
+
 end
