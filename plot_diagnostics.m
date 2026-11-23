@@ -1,103 +1,121 @@
 function fig = plot_diagnostics(data,state)
-% КОМПЛЕКСНА ОНЛАЙН-ДІАГНОСТИКА (ПІДРОЗДІЛ 3.6)
-% Компактне наукове оформлення: чотири панелі та звичайна легенда.
+% КОМПАКТНИЙ ПІДСУМКОВИЙ ГРАФІК (ПІДРОЗДІЛ 3.6)
+% Вертикальні пунктири показують початок заданих порушень,
+% а не час першого діагностичного попередження.
+
 t = data.tH(:);
 fig = figure('Name','Комплексний онлайн-моніторинг', ...
-    'Color','w','Position',[100 60 800 720]);
+    'Color','w','Position',[100 80 820 700]);
 
-%% 1. Відносне насичення за IEC 60422
-ax1 = subplot(4,1,1);
-h1 = plot(t,state.relativeSaturationPct,'LineWidth',1.5);
-hold on;
-h2 = yline(state.rsGoodUpperPct,'--','LineWidth',1);
-h3 = yline(state.rsFairUpperPct,'--','LineWidth',1);
-grid on;
-ylabel('RS, %');
-title('Відносне насичення водою');
-legend([h1 h2 h3],{'RS','10 %','20 %'}, ...
-    'Location','northwest','FontSize',9);
+% Чотири однакові панелі; знизу залишено місце лише для короткої примітки.
+tl = tiledlayout(fig,4,1,'TileSpacing','compact','Padding','compact');
+tl.Units = 'normalized';
+tl.OuterPosition = [0.075 0.13 0.91 0.85];
 
-%% 2. Зміна температурно-скоригованих втрат
-ax2 = subplot(4,1,2);
-plot(t,state.deltaTanDeltaRef,'LineWidth',1.5);
-hold on;
-yline(0,'--','HandleVisibility','off');
-grid on;
-ylabel('\Delta tg \delta');
-title('Зміна скоригованих діелектричних втрат');
+%% 1. Відносне насичення водою
+ax1 = nexttile(tl);
+plot(ax1,t,state.relativeSaturationPct,'LineWidth',1.5);
+hold(ax1,'on');
+yline(ax1,state.rsGoodUpperPct,'--','10 %', ...
+    'Color',[0.48 0.48 0.48],'FontSize',8, ...
+    'LabelHorizontalAlignment','left','LabelVerticalAlignment','bottom');
+yline(ax1,state.rsFairUpperPct,'--','20 %', ...
+    'Color',[0.48 0.48 0.48],'FontSize',8, ...
+    'LabelHorizontalAlignment','left','LabelVerticalAlignment','bottom');
+ylabel(ax1,'RS, %');
+title(ax1,'Відносне насичення водою');
 
-%% 3. Приведена електропровідність
-ax3 = subplot(4,1,3);
-h1 = plot(t,state.kSigma,'LineWidth',1.5);
-hold on;
-h2 = yline(state.dielectricKLimit,'--','LineWidth',1);
-grid on;
-ylabel('K_\sigma');
-title('Відносна зміна електропровідності');
-legend([h1 h2],{'K_\sigma','Умовна межа'}, ...
-    'Location','northwest','FontSize',9);
+%% 2. Зміна скоригованих діелектричних втрат
+ax2 = nexttile(tl);
+plot(ax2,t,state.deltaTanDeltaRef,'LineWidth',1.5);
+hold(ax2,'on');
+yline(ax2,0,'--','Color',[0.48 0.48 0.48], ...
+    'HandleVisibility','off');
+ylabel(ax2,'\Delta tg \delta');
+title(ax2,'Зміна діелектричних втрат');
 
-%% 4. Попередження окремих онлайн-каналів
-ax4 = subplot(4,1,4);
-alarms = double([state.moisture,state.dielectric, ...
+%% 3. Відносна зміна електропровідності
+ax3 = nexttile(tl);
+plot(ax3,t,state.kSigma,'LineWidth',1.5);
+hold(ax3,'on');
+yline(ax3,state.dielectricKLimit,'--','Межа', ...
+    'Color',[0.48 0.48 0.48],'FontSize',8, ...
+    'LabelHorizontalAlignment','left','LabelVerticalAlignment','bottom');
+ylabel(ax3,'K_\sigma');
+title(ax3,'Зміна електропровідності');
+
+%% 4. Попередження чотирьох незалежних каналів
+ax4 = nexttile(tl);
+flags = double([state.moisture,state.dielectric, ...
     state.thermal,state.dga])';
-imagesc(t,1:4,alarms);
-axis xy;
-colormap(ax4,[0.96 0.96 0.96; 0.85 0.26 0.25]);
+imagesc(ax4,t,1:4,flags);
+axis(ax4,'xy');
+colormap(ax4,[0.96 0.96 0.96; 0.85 0.25 0.24]);
 caxis(ax4,[0 1]);
-yticks(1:4);
-yticklabels({'Волога','Діел.','Тепло','DGA'});
-xlabel('Час, год');
-title('Діагностичні попередження (червоний — активне)');
-hold on;
+ylim(ax4,[0.5 4.5]);
+yticks(ax4,1:4);
+yticklabels(ax4,{'Волога','Діел.','Тепло','DGA'});
+title(ax4,'Попередження (червоний — активне)');
+xlabel(ax4,'Час, год');
+hold(ax4,'on');
 
-%% Вертикальні пунктири — момент ПОЧАТКУ заданої несправності
-% Не слід плутати з часом першого діагностичного попередження.
-starts = [data.faultStartH.dielectric,data.faultStartH.cooling, ...
-    data.faultStartH.moisture,data.faultStartH.gas];
-names = {'Діел. зміни','Охолодження','Волога','Газоутворення'};
-colors = [0.82 0.22 0.24; 0.58 0.28 0.73; ...
-    0.91 0.49 0.12; 0.17 0.51 0.72];
+%% Однотипні позначки моменту початку несправностей
+starts = [data.faultStartH.dielectric, ...
+    data.faultStartH.cooling, ...
+    data.faultStartH.moisture, ...
+    data.faultStartH.gas];
+labels = {'діел. зміни','охолодження','надходження води','газоутворення'};
+axesList = [ax1 ax2 ax3 ax4];
 
-% Лінії на верхніх панелях приховані від їхніх легенд.
-for i = 1:numel(starts)
-    if ~isfinite(starts(i))
-        continue;
+for j = 1:numel(axesList)
+    ax = axesList(j);
+    xlim(ax,[t(1) t(end)]);
+    xticks(ax,linspace(t(1),t(end),7));
+    set(ax,'FontSize',10,'Box','on','LineWidth',0.7, ...
+        'TickDir','out','Layer','top');
+    if j < 4
+        set(ax,'XTickLabel',[]);
+        grid(ax,'on');
     end
-    mark_fault_start(ax1,starts(i),'',colors(i,:));
-    mark_fault_start(ax2,starts(i),'',colors(i,:));
-    mark_fault_start(ax3,starts(i),'',colors(i,:));
+    for i = 1:numel(starts)
+        if isfinite(starts(i))
+            xline(ax,starts(i),'--','Color',[0.48 0.48 0.48], ...
+                'LineWidth',0.95,'HandleVisibility','off');
+        end
+    end
 end
 
-% На останній панелі ці самі лінії входять до звичайної легенди MATLAB.
-eventHandles = gobjects(0);
-eventLabels = {};
+%% Нумерація подій тільки на верхній панелі
+% Цифри розміщено всередині верхньої частини осі, не над заголовком.
+yl = ylim(ax1);
 for i = 1:numel(starts)
     if isfinite(starts(i))
-        h = line(ax4,[starts(i) starts(i)],[0.5 4.5], ...
-            'LineStyle','--','LineWidth',1.4,'Color',colors(i,:));
-        eventHandles(end+1) = h; %#ok<AGROW>
-        eventLabels{end+1} = sprintf('%.0f год — %s', ...
-            starts(i),names{i}); %#ok<AGROW>
+        text(ax1,starts(i),yl(2)-0.035*diff(yl),sprintf('%d',i), ...
+            'HorizontalAlignment','center','VerticalAlignment','top', ...
+            'FontSize',9,'FontWeight','bold','BackgroundColor','w', ...
+            'Margin',0.3,'Clipping','on');
     end
 end
 
-format_time_axes(fig,t,7);
-ylim(ax4,[0.5 4.5]);
-
-%% Рівні за розміром панелі; під ними — стандартна легенда.
-set([ax1 ax2 ax3 ax4],'FontSize',10);
-set(ax1,'Position',[0.13 0.775 0.83 0.16]);
-set(ax2,'Position',[0.13 0.58 0.83 0.16]);
-set(ax3,'Position',[0.13 0.385 0.83 0.16]);
-set(ax4,'Position',[0.13 0.19 0.83 0.16]);
-
-if ~isempty(eventHandles)
-    lg = legend(ax4,eventHandles,eventLabels, ...
-        'NumColumns',2,'Orientation','horizontal', ...
-        'Box','off','FontSize',10);
-    set(lg,'Units','normalized','Position',[0.14 0.022 0.81 0.085]);
-    % Після створення легенди MATLAB може змінити розмір осі.
-    set(ax4,'Position',[0.13 0.19 0.83 0.16]);
+%% Коротка розшифровка під рисунком (без легенд і декоративних блоків)
+items = {};
+for i = 1:numel(starts)
+    if isfinite(starts(i))
+        items{end+1} = sprintf('%d — %s (%.0f год)', ...
+            i,labels{i},starts(i)); %#ok<AGROW>
+    end
+end
+if ~isempty(items)
+    if numel(items) > 2
+        line1 = strjoin(items(1:2),'     ');
+        line2 = strjoin(items(3:end),'     ');
+        note = {line1;line2};
+    else
+        note = strjoin(items,'     ');
+    end
+    annotation(fig,'textbox',[0.11 0.012 0.86 0.075], ...
+        'String',note,'HorizontalAlignment','center', ...
+        'VerticalAlignment','middle','FontSize',10, ...
+        'EdgeColor','none','Interpreter','none');
 end
 end

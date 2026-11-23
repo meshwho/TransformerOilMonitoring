@@ -267,7 +267,7 @@ if cfg.savePlots
     saveas(f1,'figures/01_thermal.png');
     saveas(f2,'figures/02_moisture.png');
     saveas(f3,'figures/03_dga.png');
-    print(f4,'figures/04_diagnostics.png','-dpng','-r220');
+    print(f4,'figures/04_diagnostics.png','-dpng','-r300');
     saveas(fProperties,'figures/07_oil_properties.png');
     saveas(fDielectric,'figures/08_dielectric_online.png');
 
