@@ -69,6 +69,12 @@ cfg.limits.waterPPM = 35;
 cfg.limits.relativeSaturationPct = 30;
 cfg.limits.h2RatePPMperH = 1.0;
 cfg.limits.c2h2PPM = 3;
+
+%% Комплексна онлайн-оцінка (формули 3.24-3.27)
+% Умовні межі для скоригованого tan(delta) і K_sigma.
+% Не є граничними значеннями IEC або виробника датчика.
+cfg.limits.tanDeltaRef = 0.004;
+cfg.limits.kSigma = 1.5;
 % Умовні межі середніх концентрацій і швидкостей їх зміни.
 % Порядок: H2, CH4, C2H6, C2H4, C2H2, CO, CO2.
 cfg.limits.dgaConcentrationPPM = [70 40 20 25 3 250 5000];
