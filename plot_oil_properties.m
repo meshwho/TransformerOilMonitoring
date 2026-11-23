@@ -1,5 +1,5 @@
 
-function fig = plot_oil_properties(data, oil)
+function fig = plot_oil_properties(data, oil, state)
 % ГРАФІКИ ТЕМПЕРАТУРНО-ЗАЛЕЖНИХ
 % ВЛАСТИВОСТЕЙ ТРАНСФОРМАТОРНОГО МАСЛА
 
@@ -19,6 +19,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Температура, °C');
 title('Температура масла');
+mark_first_warning(gca,t,state.thermal,'Перше теплове попередження');
 
 %% 2. В'язкість
 
@@ -30,6 +31,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Відносна в’язкість');
 title('В’язкість масла');
+mark_first_warning(gca,t,state.thermal,'');
 
 %% 3. Густина
 
@@ -41,6 +43,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Густина, кг/м³');
 title('Густина масла');
+mark_first_warning(gca,t,state.thermal,'');
 
 %% 4. Питома теплоємність
 
@@ -52,6 +55,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Дж/(кг·К)');
 title('Питома теплоємність');
+mark_first_warning(gca,t,state.thermal,'');
 
 %% 5. Теплопровідність
 
@@ -63,6 +67,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Вт/(м·К)');
 title('Теплопровідність');
+mark_first_warning(gca,t,state.thermal,'');
 
 %% 6. Коефіцієнт об'ємного розширення
 
@@ -74,6 +79,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Коефіцієнт, 1/К');
 title('Об’ємне розширення');
+mark_first_warning(gca,t,state.thermal,'');
 
 %% 7. Питомий електричний опір
 
@@ -85,6 +91,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Питомий опір, Ом·м');
 title('Питомий електричний опір');
+mark_first_warning(gca,t,state.dielectric,'');
 
 %% 8. Тангенс діелектричних втрат
 
@@ -96,6 +103,7 @@ grid on;
 xlabel('Час, год');
 ylabel('tg δ');
 title('Тангенс діелектричних втрат');
+mark_first_warning(gca,t,state.dielectric,'Перше діелектричне попередження');
 
 %% Межі осі часу: від першого до останнього вимірювання
 format_time_axes(fig,t,5);

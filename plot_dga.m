@@ -17,6 +17,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Концентрація, ppm');
 title('Показання газоаналізатора');
+mark_first_warning(gca,t,dga.warning,'Перше попередження DGA');
 legend('Водень (H₂)','Метан (CH₄)','Етан (C₂H₆)', ...
        'Етилен (C₂H₄)','Ацетилен (C₂H₂)', ...
        'Location','best');
@@ -30,6 +31,7 @@ grid on;
 xlabel('Час, год');
 ylabel('TDCG, ppm');
 title('Сумарна концентрація горючих газів');
+mark_first_warning(gca,t,dga.warning,'');
 legend('За показаннями','Середнє за 24 години', ...
        'Location','best');
 
@@ -43,6 +45,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Зміна H₂, ppm/год');
 title('Швидкість зміни концентрації водню за добу');
+mark_first_warning(gca,t,dga.warning,'');
 legend('Швидкість зміни','Умовна межа','Нульова зміна', ...
        'Location','best');
 
