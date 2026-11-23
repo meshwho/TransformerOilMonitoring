@@ -23,7 +23,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Провідність, пСм/м');
 title('Електропровідність з температурною корекцією');
-mark_fault_start(gca,data.faultStartH.dielectric,'Початок зміни електричних властивостей',[0.82 0.22 0.24]);
+mark_fault_start(gca,data.faultStartH.dielectric,'Діел.',[0.82 0.22 0.24]);
 legend('За поточної температури', ...
        'Приведено до опорної температури', ...
        'Location','best');

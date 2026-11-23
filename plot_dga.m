@@ -17,7 +17,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Концентрація, ppm');
 title('Показання газоаналізатора');
-mark_fault_start(gca,data.faultStartH.gas,'Початок додаткового газоутворення',[0.17 0.51 0.72]);
+mark_fault_start(gca,data.faultStartH.gas,'DGA',[0.17 0.51 0.72]);
 legend('Водень (H₂)','Метан (CH₄)','Етан (C₂H₆)', ...
        'Етилен (C₂H₄)','Ацетилен (C₂H₂)', ...
        'Location','best');

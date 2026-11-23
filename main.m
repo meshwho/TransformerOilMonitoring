@@ -27,13 +27,6 @@ moisture = model_moisture(data,cfg);
 dga = model_dga(data,cfg);
 
 
-%% Оцінка якості та старіння масла
-
-quality = model_oil_quality(data,cfg);
-
-ageing = model_oil_ageing(data);
-
-
 %% 4. Комплексна оцінка стану
 
 state = evaluate_state(thermal,moisture,dga,oil,cfg);
@@ -186,141 +179,67 @@ fprintf('Тангенс втрат: %.5f ... %.5f\n', ...
 fprintf('\nЕлектричні характеристики розраховано ');
 fprintf('за синтетичними показаннями електричного датчика.\n');
 
-%% Результати оцінювання якості масла
+%% 6. Комплексна діагностика за підрозділом 3.6
 
-fprintf('\nЯКІСТЬ ТРАНСФОРМАТОРНОГО МАСЛА\n');
+fprintf('\nКОМПЛЕКСНИЙ ОНЛАЙН-МОНІТОРИНГ\n');
 fprintf('----------------------------------------\n');
 
-fprintf('Кислотне число: %.3f мг КОН/г\n', ...
-    quality.acid);
-
-fprintf('Пробивна напруга: %.2f кВ\n', ...
-    quality.breakdownKV);
-
-fprintf('Тангенс діелектричних втрат: %.4f\n', ...
-    quality.tanDelta);
-
-fprintf('Міжфазний натяг: %.2f мН/м\n', ...
-    quality.ift);
-
-%% Результати аналізу старіння
-
-fprintf('\nЗМІНА ХАРАКТЕРИСТИК МАСЛА\n');
-fprintf('----------------------------------------\n');
-
-fprintf('Зміна кислотного числа: %.4f мг КОН/(г·міс)\n', ...
-    ageing.acidRate);
-
-fprintf('Зміна пробивної напруги: %.3f кВ/міс\n', ...
-    ageing.breakdownRate);
-
-fprintf('Зміна tg delta: %.5f за місяць\n', ...
-    ageing.tanDeltaRate);
-
-fprintf('Зміна міжфазного натягу: %.3f мН/(м·міс)\n', ...
-    ageing.iftRate);
-
-if quality.warning
-    fprintf('\nЯКІСТЬ МАСЛА: ПОТРЕБУЄ ПЕРЕВІРКИ\n');
+fprintf('Відносне насичення водою: %.2f %%\n', ...
+    state.relativeSaturationPct(end));
+if state.rsBand(end) == 1
+    fprintf('Поточний діапазон RS: <10 %% (Good)\n');
+elseif state.rsBand(end) == 2
+    fprintf('Поточний діапазон RS: 10-20 %% (Fair)\n');
+elseif state.rsBand(end) == 3
+    fprintf('Поточний діапазон RS: >20 %% (Poor)\n');
 else
-    fprintf('\nЯКІСТЬ МАСЛА: ВІДХИЛЕНЬ НЕ ВИЯВЛЕНО\n');
+    fprintf('Поточний діапазон RS: недостатньо даних\n');
 end
+fprintf('Це лише орієнтир IEC 60422; 72 год замало для\n');
+fprintf('остаточної оцінки (потрібен щонайменше один місяць).\n');
 
-fprintf('Оцінка виконана за останніми ');
-fprintf('умовними лабораторними даними.\n');
+fprintf('Зміна скоригованого tg delta: %+.6f\n', ...
+    state.deltaTanDeltaRef(end));
+fprintf('Коефіцієнт K_sigma: %.3f\n',state.kSigma(end));
 
-
-
-%% 6. Діагностичні попередження за онлайн-даними
-
-fprintf('\nРЕЗУЛЬТАТИ ОНЛАЙН-ДІАГНОСТИКИ\n');
-fprintf('----------------------------------------\n');
-
-names = {'Тепловий стан', ...
-         'Вологовміст', ...
-         'Газовий аналіз', ...
-         'Діелектричні властивості'};
-
-flags = [state.thermal, state.moisture, ...
-         state.dga, state.dielectric];
+names = {'Вологовміст','Діелектричні властивості', ...
+         'Тепловий стан','Газовий аналіз'};
+flags = [state.moisture,state.dielectric,state.thermal,state.dga];
 
 for j = 1:numel(names)
     firstWarning = find(flags(:,j),1,'first');
-
     if isempty(firstWarning)
-        fprintf('%s: перевищень умовних меж не виявлено\n',names{j});
+        fprintf('%s: попередження немає\n',names{j});
     else
-        fprintf('%s: попередження з %.2f год\n', ...
+        fprintf('%s: перше попередження з %.2f год\n', ...
             names{j},data.tH(firstWarning));
     end
 end
 
-%% 7. Комплексний показник стану масла (підрозділ 3.6)
-
-fprintf('\nКОМПЛЕКСНА ОЦІНКА СТАНУ МАСЛА\n');
-fprintf('----------------------------------------\n');
-
-if ~state.oilDataAvailable(end)
-    fprintf('Стан масла: НЕДОСТАТНЬО ОНЛАЙН-ДАНИХ\n');
-    fprintf('Потрібно перевірити показання датчиків.\n');
+fprintf('\nДІАГНОСТИЧНИЙ ВИСНОВОК\n');
+if ~state.dataAvailable(end)
+    fprintf('Недостатньо достовірних онлайн-даних.\n');
+elseif state.moisture(end) && state.dielectric(end)
+    fprintf('Є відхилення вологісних та електричних характеристик.\n');
+    fprintf('Потрібна перевірка впливу води й можливих забруднень.\n');
+elseif state.moisture(end)
+    fprintf('Є відхилення вологісних характеристик масла.\n');
+    fprintf('Рекомендовано перевірити вологісний стан ізоляції.\n');
+elseif state.dielectric(end)
+    fprintf('Є відхилення діелектричних характеристик масла.\n');
+    fprintf('Рекомендовано додаткові випробування масла.\n');
 else
-    fprintf('Вологісний показник R_M: %.3f\n', ...
-        state.moistureRatio(end));
-    fprintf('Діелектричний показник R_E: %.3f\n', ...
-        state.dielectricRatio(end));
-    fprintf('Комплексний показник R_oil: %.3f\n', ...
-        state.oilRatio(end));
-
-    if ~state.oilWarning(end)
-        fprintf('Стан масла: умовні межі не перевищені.\n');
-        fprintf('Рекомендація: продовжити онлайн-моніторинг.\n');
-    elseif state.moisture(end) && state.dielectric(end)
-        fprintf('Стан масла: відхилення вологісного та електричного стану.\n');
-        fprintf('Рекомендація: перевірити герметичність, дослідити масло\n');
-        fprintf('та визначити необхідність осушування або регенерації.\n');
-    elseif state.moisture(end)
-        fprintf('Стан масла: перевищення показників вологовмісту.\n');
-        fprintf('Рекомендація: перевірити герметичність і необхідність осушування.\n');
-    else
-        fprintf('Стан масла: зміна діелектричних властивостей.\n');
-        fprintf('Рекомендація: перевірити причину та провести випробування масла.\n');
-    end
+    fprintf('Демонстраційні межі масла не перевищені.\n');
 end
 
-if state.equipmentWarning(end)
-    fprintf('Окремо: виявлено ознаки відхилень у роботі трансформатора.\n');
-    if state.thermal(end)
-        fprintf('Рекомендація: перевірити тепловий режим і охолодження.\n');
-    end
-    if state.dga(end)
-        fprintf('Рекомендація: перевірити причини газоутворення (DGA).\n');
-    end
+if state.thermal(end)
+    fprintf('Окремо потрібно перевірити охолодження трансформатора.\n');
 end
-
-fprintf('\nЗАГАЛЬНИЙ РЕЗУЛЬТАТ\n');
-fprintf('----------------------------------------\n');
-if ~state.oilDataAvailable(end)
-    fprintf('Онлайн-оцінка масла: недостатньо даних.\n');
-elseif state.oilWarning(end)
-    fprintf('Онлайн-оцінка масла: ВИЯВЛЕНО ВІДХИЛЕННЯ.\n');
-else
-    fprintf('Онлайн-оцінка масла: ПЕРЕВИЩЕНЬ НЕ ВИЯВЛЕНО.\n');
+if state.dga(end)
+    fprintf('Окремо потрібно дослідити причини газоутворення.\n');
 end
-
-if state.equipmentWarning(end)
-    fprintf('Діагностика обладнання: ВИЯВЛЕНО ПОПЕРЕДЖЕННЯ.\n');
-else
-    fprintf('Діагностика обладнання: попереджень немає.\n');
-end
-
-fprintf('Активних онлайн-попереджень: %d\n', ...
-    state.activeWarnings(end));
-fprintf('Лабораторні показники не входять у R_oil.\n');
-fprintf('Значення R_oil не є відсотком старіння масла.\n');
-fprintf('Перевищення меж не означає автоматичної заміни масла.\n');
-
-fprintf('\nУВАГА: синтетичні дані та умовні діагностичні пороги.\n');
-fprintf('Система не призначена для промислової діагностики.\n\n');
+fprintf('Рішення про заміну масла автоматично не приймається.\n');
+fprintf('Усі показання синтетичні, пороги тривог умовні.\n\n');
 
 %% 8. Побудова графіків
 
@@ -328,8 +247,7 @@ f1 = plot_thermal(data,thermal,cfg);
 f2 = plot_moisture(data,moisture,cfg);
 f3 = plot_dga(data,dga,cfg);
 f4 = plot_diagnostics(data,state);
-f5 = plot_oil_quality(quality);
-f6 = plot_oil_ageing(data);
+% Лабораторні графіки не входять до онлайн-моніторингу.
 
 %% Графіки властивостей масла
 
@@ -350,8 +268,6 @@ if cfg.savePlots
     saveas(f2,'figures/02_moisture.png');
     saveas(f3,'figures/03_dga.png');
     saveas(f4,'figures/04_diagnostics.png');
-    saveas(f5,'figures/05_oil_quality.png');
-    saveas(f6,'figures/06_oil_ageing.png');
     saveas(fProperties,'figures/07_oil_properties.png');
     saveas(fDielectric,'figures/08_dielectric_online.png');
 

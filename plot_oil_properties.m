@@ -19,7 +19,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Температура, °C');
 title('Температура масла');
-mark_fault_start(gca,data.faultStartH.cooling,'Початок порушення охолодження',[0.58 0.28 0.73]);
+mark_fault_start(gca,data.faultStartH.cooling,'Охол.',[0.58 0.28 0.73]);
 
 %% 2. В'язкість
 
@@ -91,7 +91,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Питомий опір, Ом·м');
 title('Питомий електричний опір');
-mark_fault_start(gca,data.faultStartH.dielectric,'Початок зміни властивостей',[0.82 0.22 0.24]);
+mark_fault_start(gca,data.faultStartH.dielectric,'Діел.',[0.82 0.22 0.24]);
 
 %% 8. Тангенс діелектричних втрат
 
