@@ -12,7 +12,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Температура, °C');
 title('Температура трансформаторного масла');
-mark_first_warning(gca,t,moisture.warning,'');
+mark_fault_start(gca,data.faultStartH.moisture,'',[0.91 0.49 0.12]);
 
 %% Поточний та середній вологовміст
 subplot(4,1,2);
@@ -24,7 +24,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Вода, мг/кг');
 title('Зміна вологовмісту трансформаторного масла');
-mark_first_warning(gca,t,moisture.warning,'Перше попередження вологості');
+mark_fault_start(gca,data.faultStartH.moisture,'Початок надходження води',[0.91 0.49 0.12]);
 legend('Поточний вологовміст', ...
        'Середнє за 24 години', ...
        'Умовна межа', ...
@@ -39,7 +39,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Насичення, %');
 title('Відносне насичення масла водою');
-mark_first_warning(gca,t,moisture.warning,'');
+mark_fault_start(gca,data.faultStartH.moisture,'',[0.91 0.49 0.12]);
 legend('Відносне насичення', ...
        'Умовна межа', ...
        'Location','best');
@@ -53,7 +53,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Зміна, мг/кг/добу');
 title('Зміна середнього вологовмісту за добу');
-mark_first_warning(gca,t,moisture.warning,'');
+mark_fault_start(gca,data.faultStartH.moisture,'',[0.91 0.49 0.12]);
 legend('Добова зміна', ...
        'Нульова зміна', ...
        'Location','best');

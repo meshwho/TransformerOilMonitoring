@@ -1,4 +1,4 @@
-function fig = plot_dielectric_online(data,oil,state)
+function fig = plot_dielectric_online(data,oil)
 % ЧОТИРИ ГРАФІКИ ОБРОБКИ ОНЛАЙН-ДІЕЛЕКТРИЧНИХ ВИМІРЮВАНЬ
 
 t = data.tH(:);
@@ -12,7 +12,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Температура, °C');
 title('Температура масла за показаннями датчика');
-mark_first_warning(gca,t,state.dielectric,'');
+mark_fault_start(gca,data.faultStartH.dielectric,'',[0.82 0.22 0.24]);
 
 %% 2. Питомa електропровідність
 subplot(4,1,2);
@@ -23,7 +23,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Провідність, пСм/м');
 title('Електропровідність з температурною корекцією');
-mark_first_warning(gca,t,state.dielectric,'');
+mark_fault_start(gca,data.faultStartH.dielectric,'Початок зміни електричних властивостей',[0.82 0.22 0.24]);
 legend('За поточної температури', ...
        'Приведено до опорної температури', ...
        'Location','best');
@@ -37,7 +37,7 @@ grid on;
 xlabel('Час, год');
 ylabel('tan δ');
 title('Діелектричні втрати масла');
-mark_first_warning(gca,t,state.dielectric,'');
+mark_fault_start(gca,data.faultStartH.dielectric,'',[0.82 0.22 0.24]);
 legend('За поточної температури', ...
        'Приведено до опорної температури', ...
        'Location','best');
@@ -51,7 +51,7 @@ grid on;
 xlabel('Час, год');
 ylabel('K_\sigma');
 title('Відносна зміна електропровідності');
-mark_first_warning(gca,t,state.dielectric,'Перше діелектричне попередження');
+mark_fault_start(gca,data.faultStartH.dielectric,'',[0.82 0.22 0.24]);
 legend('K_\sigma', 'Початковий рівень', 'Location','best');
 
 format_time_axes(fig,t,7);

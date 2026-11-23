@@ -329,14 +329,14 @@ f2 = plot_moisture(data,moisture,cfg);
 f3 = plot_dga(data,dga,cfg);
 f4 = plot_diagnostics(data,state);
 f5 = plot_oil_quality(quality);
-f6 = plot_oil_ageing(data,cfg);
+f6 = plot_oil_ageing(data);
 
 %% Графіки властивостей масла
 
-fProperties = plot_oil_properties(data,oil,state);
+fProperties = plot_oil_properties(data,oil);
 
 %% Окремі графіки онлайн-моніторингу діелектричних властивостей
-fDielectric = plot_dielectric_online(data,oil,state);
+fDielectric = plot_dielectric_online(data,oil);
 
 %% 9. Збереження графіків
 

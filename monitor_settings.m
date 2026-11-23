@@ -10,6 +10,12 @@ cfg.durationH = 72;     % год
 cfg.dtH = 0.25;         % год
 cfg.savePlots = false;
 
+%% Моменти виникнення штучних несправностей у сценаріях
+cfg.fault.coolingStartH = 40;  % Початок порушення охолодження
+cfg.fault.gasStartH = 50;      % Початок додаткового газоутворення
+% Волога: cfg.moisture.ingressStartH (46 год)
+% Електричні властивості: cfg.oilProperties.changeStartH (36 год)
+
 %% Нелінійна теплова модель масла (МАН, 3.13)
 % Коефіцієнти демонстраційні, не визначені за паспортом трансформатора.
 cfg.thermal.lossRatio = 5;

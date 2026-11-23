@@ -26,7 +26,7 @@ realCfg = cfg;
 realCfg.thermal.coolingEfficiency = ones(N,1);
 
 if coolingFault
-    reduction = 0.35*min(max((t-40)/8,0),1);
+    reduction = 0.35*min(max((t-cfg.fault.coolingStartH)/8,0),1);
     realCfg.thermal.coolingEfficiency = 1-reduction;
 end
 
@@ -59,7 +59,7 @@ end
 gasMeasurementMask = false(N,1);
 gasMeasurementMask(1:samplingStep:end) = true;
 tGas = t(gasMeasurementMask);
-ramp = gasFault*max(tGas-50,0);
+ramp = gasFault*max(tGas-cfg.fault.gasStartH,0);
 
 % Умовний фоновий газовий склад і його зміна після 50-ї години.
 gasReadings = [35+0.06*tGas+3.3*ramp, ...
@@ -82,6 +82,26 @@ gasHeld = gasReadings(lastGasIndex,:);
 
 %% Формування вимірювань
 data.tH = t;
+
+%% Мітки відомих генератору початків штучних несправностей
+% Задаються сценарієм, а не діагностичними попередженнями.
+% Для неактивних несправностей залишається NaN.
+data.faultStartH.cooling = nan;
+data.faultStartH.moisture = nan;
+data.faultStartH.gas = nan;
+data.faultStartH.dielectric = nan;
+if coolingFault
+    data.faultStartH.cooling = cfg.fault.coolingStartH;
+end
+if moistureFault
+    data.faultStartH.moisture = cfg.moisture.ingressStartH;
+end
+if gasFault
+    data.faultStartH.gas = cfg.fault.gasStartH;
+end
+if cfg.scenario == 5 || cfg.scenario == 6
+    data.faultStartH.dielectric = cfg.oilProperties.changeStartH;
+end
 data.loadPU = loadPU;
 data.ambientC = ambientC;
 data.oilTempSensorC = oilTempC;

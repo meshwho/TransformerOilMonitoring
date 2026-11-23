@@ -16,8 +16,10 @@ grid on;
 xlabel('Час, год');
 ylabel('Відносний показник');
 title('Комплексний показник стану масла');
-mark_first_warning(gca,t,state.oilWarning, ...
-    'Перше перевищення R_{oil}');
+mark_fault_start(gca,data.faultStartH.dielectric,'Початок зміни електричних властивостей',[0.82 0.22 0.24]);
+mark_fault_start(gca,data.faultStartH.moisture,'Початок надходження води',[0.91 0.49 0.12]);
+mark_fault_start(gca,data.faultStartH.cooling,'',[0.58 0.28 0.73]);
+mark_fault_start(gca,data.faultStartH.gas,'',[0.17 0.51 0.72]);
 legend('Вологісний стан R_M', ...
     'Діелектричний стан R_E', ...
     'Комплексний показник R_{oil}', ...
@@ -36,22 +38,10 @@ yticks([0 1]);
 xlabel('Час, год');
 ylabel('Попередження');
 title('Причини діагностичних попереджень');
-mark_first_warning(gca,t,state.anyWarning, ...
-    'Перше онлайн-попередження');
-
-% Точки окремо вказують перше спрацювання кожного з чотирьох каналів.
-alarmFlags = [state.moisture(:),state.dielectric(:), ...
-    state.thermal(:),state.dga(:)];
-alarmColors = get(gca,'ColorOrder');
-for channel = 1:size(alarmFlags,2)
-    firstIndex = find(alarmFlags(:,channel),1,'first');
-    if ~isempty(firstIndex)
-        plot(t(firstIndex),1,'o','MarkerSize',6, ...
-            'MarkerFaceColor',alarmColors(channel,:), ...
-            'MarkerEdgeColor',alarmColors(channel,:), ...
-            'HandleVisibility','off');
-    end
-end
+mark_fault_start(gca,data.faultStartH.dielectric,'',[0.82 0.22 0.24]);
+mark_fault_start(gca,data.faultStartH.moisture,'',[0.91 0.49 0.12]);
+mark_fault_start(gca,data.faultStartH.cooling,'Початок порушення охолодження',[0.58 0.28 0.73]);
+mark_fault_start(gca,data.faultStartH.gas,'Початок газоутворення',[0.17 0.51 0.72]);
 legend('Вологовміст','Діелектричні властивості', ...
     'Тепловий стан','Газовий аналіз', 'Location','best');
 
@@ -64,7 +54,10 @@ yticks(0:4);
 xlabel('Час, год');
 ylabel('Кількість');
 title('Кількість одночасних онлайн-попереджень');
-mark_first_warning(gca,t,state.anyWarning,'');
+mark_fault_start(gca,data.faultStartH.dielectric,'',[0.82 0.22 0.24]);
+mark_fault_start(gca,data.faultStartH.cooling,'',[0.58 0.28 0.73]);
+mark_fault_start(gca,data.faultStartH.moisture,'',[0.91 0.49 0.12]);
+mark_fault_start(gca,data.faultStartH.gas,'',[0.17 0.51 0.72]);
 
 format_time_axes(fig,t,7);
 

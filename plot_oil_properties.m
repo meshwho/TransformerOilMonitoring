@@ -1,5 +1,5 @@
 
-function fig = plot_oil_properties(data, oil, state)
+function fig = plot_oil_properties(data, oil)
 % ГРАФІКИ ТЕМПЕРАТУРНО-ЗАЛЕЖНИХ
 % ВЛАСТИВОСТЕЙ ТРАНСФОРМАТОРНОГО МАСЛА
 
@@ -19,7 +19,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Температура, °C');
 title('Температура масла');
-mark_first_warning(gca,t,state.thermal,'Перше теплове попередження');
+mark_fault_start(gca,data.faultStartH.cooling,'Початок порушення охолодження',[0.58 0.28 0.73]);
 
 %% 2. В'язкість
 
@@ -31,7 +31,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Відносна в’язкість');
 title('В’язкість масла');
-mark_first_warning(gca,t,state.thermal,'');
+mark_fault_start(gca,data.faultStartH.cooling,'',[0.58 0.28 0.73]);
 
 %% 3. Густина
 
@@ -43,7 +43,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Густина, кг/м³');
 title('Густина масла');
-mark_first_warning(gca,t,state.thermal,'');
+mark_fault_start(gca,data.faultStartH.cooling,'',[0.58 0.28 0.73]);
 
 %% 4. Питома теплоємність
 
@@ -55,7 +55,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Дж/(кг·К)');
 title('Питома теплоємність');
-mark_first_warning(gca,t,state.thermal,'');
+mark_fault_start(gca,data.faultStartH.cooling,'',[0.58 0.28 0.73]);
 
 %% 5. Теплопровідність
 
@@ -67,7 +67,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Вт/(м·К)');
 title('Теплопровідність');
-mark_first_warning(gca,t,state.thermal,'');
+mark_fault_start(gca,data.faultStartH.cooling,'',[0.58 0.28 0.73]);
 
 %% 6. Коефіцієнт об'ємного розширення
 
@@ -79,7 +79,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Коефіцієнт, 1/К');
 title('Об’ємне розширення');
-mark_first_warning(gca,t,state.thermal,'');
+mark_fault_start(gca,data.faultStartH.cooling,'',[0.58 0.28 0.73]);
 
 %% 7. Питомий електричний опір
 
@@ -91,7 +91,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Питомий опір, Ом·м');
 title('Питомий електричний опір');
-mark_first_warning(gca,t,state.dielectric,'');
+mark_fault_start(gca,data.faultStartH.dielectric,'Початок зміни властивостей',[0.82 0.22 0.24]);
 
 %% 8. Тангенс діелектричних втрат
 
@@ -103,7 +103,7 @@ grid on;
 xlabel('Час, год');
 ylabel('tg δ');
 title('Тангенс діелектричних втрат');
-mark_first_warning(gca,t,state.dielectric,'Перше діелектричне попередження');
+mark_fault_start(gca,data.faultStartH.dielectric,'',[0.82 0.22 0.24]);
 
 %% Межі осі часу: від першого до останнього вимірювання
 format_time_axes(fig,t,5);

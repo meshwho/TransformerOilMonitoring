@@ -14,7 +14,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Температура, °C');
 title('Температурний режим трансформатора');
-mark_first_warning(gca,t,thermal.warning,'');
+mark_fault_start(gca,data.faultStartH.cooling,'Початок порушення охолодження',[0.58 0.28 0.73]);
 legend('Розрахункова температура масла', ...
        'Виміряна температура масла', ...
        'Розрахункова гаряча точка', ...
@@ -31,7 +31,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Відхилення, °C');
 title('Виміряна температура мінус розрахункова');
-mark_first_warning(gca,t,thermal.warning,'Перше теплове попередження');
+mark_fault_start(gca,data.faultStartH.cooling,'',[0.58 0.28 0.73]);
 legend('Відхилення температури', ...
        'Верхня умовна межа', ...
        'Нижня умовна межа', ...
@@ -46,7 +46,7 @@ grid on;
 xlabel('Час, год');
 ylabel('Відносна в’язкість');
 title('Зміна в’язкості масла');
-mark_first_warning(gca,t,thermal.warning,'');
+mark_fault_start(gca,data.faultStartH.cooling,'',[0.58 0.28 0.73]);
 legend('За розрахунковою температурою', ...
        'За показанням датчика', ...
        'Location','best');

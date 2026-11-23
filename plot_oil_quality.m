@@ -8,13 +8,7 @@ fig = figure( ...
 
 %% Відносні значення показників
 
-bars = bar(quality.ratio);
-% Червоним виділено показники, що перевищують умовні межі.
-bars.FaceColor = 'flat';
-barColors = repmat([0.19 0.47 0.72],numel(quality.ratio),1);
-barColors(quality.ratio >= 1,:) = repmat([0.82 0.23 0.20], ...
-    sum(quality.ratio >= 1),1);
-bars.CData = barColors;
+bar(quality.ratio);
 hold on;
 
 % Умовна діагностична межа
@@ -34,7 +28,7 @@ xtickangle(20);
 
 ylabel('Відношення до умовної межі');
 
-title('Оцінка якості масла (червоний – перевищення межі)');
+title('Оцінка якості трансформаторного масла');
 
 legend('Показники масла', ...
        'Умовна межа', ...
