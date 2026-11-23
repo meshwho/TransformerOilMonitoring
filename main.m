@@ -159,6 +159,18 @@ fprintf('Питомий електричний опір: %.3e Ом·м\n', ...
 fprintf('Тангенс діелектричних втрат: %.5f\n', ...
     oil.tanDelta(end));
 
+fprintf('Діелектрична проникність: %.4f\n', ...
+    oil.permittivityRelative(end));
+
+fprintf('Електропровідність: %.3f пСм/м\n', ...
+    oil.conductivitySperM(end)*1e12);
+
+fprintf('Електропровідність при %.0f °C: %.3f пСм/м\n', ...
+    oil.referenceTempC,oil.conductivityRefSperM(end)*1e12);
+
+fprintf('Відносна зміна K_sigma: %.3f\n', ...
+    oil.conditionIndex(end));
+
 fprintf('\nЗМІНА ПОКАЗНИКІВ ЗА 72 ГОДИНИ\n');
 fprintf('----------------------------------------\n');
 
@@ -172,7 +184,7 @@ fprintf('Тангенс втрат: %.5f ... %.5f\n', ...
     min(oil.tanDelta),max(oil.tanDelta));
 
 fprintf('\nЕлектричні характеристики розраховано ');
-fprintf('за спрощеною температурною моделлю.\n');
+fprintf('за синтетичними показаннями електричного датчика.\n');
 
 %% Результати оцінювання якості масла
 
@@ -292,6 +304,9 @@ f6 = plot_oil_ageing(data);
 
 fProperties = plot_oil_properties(data,oil);
 
+%% Окремі графіки онлайн-моніторингу діелектричних властивостей
+fDielectric = plot_dielectric_online(data,oil);
+
 %% 9. Збереження графіків
 
 if cfg.savePlots
@@ -307,5 +322,6 @@ if cfg.savePlots
     saveas(f5,'figures/05_oil_quality.png');
     saveas(f6,'figures/06_oil_ageing.png');
     saveas(fProperties,'figures/07_oil_properties.png');
+    saveas(fDielectric,'figures/08_dielectric_online.png');
 
 end

@@ -81,9 +81,24 @@ cfg.oilQuality.breakdownMin = 50;
 cfg.oilQuality.tanDeltaMax = 0.010;
 cfg.oilQuality.iftMin = 25;
 
-%% Електричні характеристики (умовні коефіцієнти)
-cfg.oilProperties.refTempC = 90;
-cfg.oilProperties.activationEnergyEV = 0.466;
-cfg.oilProperties.resistivityRefOhmM = 1e11;
-cfg.oilProperties.tanDeltaRef = 0.0025;
+%% Онлайн-контроль діелектричних властивостей масла (підрозділ 3.5)
+% Демонстраційна вимірювальна комірка: G, C та температура T.
+% Геометрична стала виводиться з ємності порожньої комірки.
+cfg.oilProperties.vacuumCapacitanceF = 100e-12;  % Ф
+cfg.oilProperties.frequencyHz = 50;              % Гц
+cfg.oilProperties.refTempC = 65;                  % °C
+cfg.oilProperties.activationEnergyEV = 0.466;    % умовний параметр
+cfg.oilProperties.initialConductivitySperM = 1e-11; % См/м при Tref
+cfg.oilProperties.initialPermittivity = 2.2;
+cfg.oilProperties.permittivityTempSlopePerC = -0.0015;
+
+% Похибка синтетичних вимірювань (відносна).
+cfg.oilProperties.conductanceNoiseRelative = 0.002;
+cfg.oilProperties.capacitanceNoiseRelative = 0.0003;
+
+% Штучна прискорена зміна стану масла у сценаріях 5 і 6.
+% Це НЕ модель швидкості хімічного окиснення.
+cfg.oilProperties.changeStartH = 36;
+cfg.oilProperties.changeDurationH = 36;
+cfg.oilProperties.changeRelative = 0.60;
 end

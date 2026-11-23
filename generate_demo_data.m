@@ -95,6 +95,45 @@ data.c2h2PPM = gasHeld(:,5);
 data.coPPM = gasHeld(:,6);
 data.co2PPM = gasHeld(:,7);
 
+%% Синтетичні показання діелектричної вимірювальної комірки
+% Вхід системи: провідність G, ємність C та температура масла T.
+% Зміна стану (сценарії 5 і 6) НЕ є моделлю хімічного старіння.
+diel = cfg.oilProperties;
+epsilon0 = 8.8541878128e-12;   % Ф/м
+kB = 8.617333262e-5;         % еВ/К
+
+dielectricChange = (cfg.scenario == 5 || cfg.scenario == 6);
+changeProgress = min(max((t-diel.changeStartH)/ ...
+    diel.changeDurationH,0),1);
+conditionFactor = 1+dielectricChange*diel.changeRelative*changeProgress;
+
+% Базова провідність при опорній температурі та зміна властивостей.
+sigmaReference = diel.initialConductivitySperM*conditionFactor;
+
+% Фізична температура визначає сигнал комірки; показання T має шум.
+temperatureTrueK = realThermal.topOilC+273.15;
+temperatureRefK = diel.refTempC+273.15;
+sigmaTrue = sigmaReference.*exp(-diel.activationEnergyEV/kB.* ...
+    (1./temperatureTrueK-1/temperatureRefK));
+
+epsilonRelativeTrue = diel.initialPermittivity+ ...
+    diel.permittivityTempSlopePerC.* ...
+    (realThermal.topOilC-diel.refTempC);
+
+% Калібрувальна ємність порожньої комірки Cvac = epsilon0*A/d.
+% Ефективна провідність G = sigma*A/d, ємність C = epsr*Cvac.
+oilConductanceS = sigmaTrue*diel.vacuumCapacitanceF/epsilon0;
+oilCapacitanceF = epsilonRelativeTrue*diel.vacuumCapacitanceF;
+
+% Незалежний умовний шум електричних вимірювань.
+oilConductanceS = oilConductanceS.* ...
+    (1+diel.conductanceNoiseRelative*randn(N,1));
+oilCapacitanceF = oilCapacitanceF.* ...
+    (1+diel.capacitanceNoiseRelative*randn(N,1));
+
+data.oilConductanceS = oilConductanceS;
+data.oilCapacitanceF = oilCapacitanceF;
+
 %% Лабораторні показники (три окремі аналізи за шість місяців)
 data.lab.month = [-6; -3; 0];
 oilAgeing = (cfg.scenario == 5 || cfg.scenario == 6);
