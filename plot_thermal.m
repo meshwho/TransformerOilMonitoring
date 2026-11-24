@@ -1,10 +1,8 @@
 function fig = plot_thermal(data,thermal,cfg)
-% ГРАФІКИ НЕЛІНІЙНОЇ ТЕПЛОВОЇ МОДЕЛІ
 
 t = data.tH;
 fig = figure('Name','Нелінійна теплова модель','Color','w');
 
-%% Температури
 subplot(3,1,1);
 plot(t,thermal.topOilC,'LineWidth',1.8);
 hold on;
@@ -20,7 +18,6 @@ legend('Розрахункова температура масла', ...
        'Розрахункова гаряча точка', ...
        'Location','best');
 
-%% Відхилення температури
 subplot(3,1,2);
 plot(t,thermal.residualC,'LineWidth',1.6);
 hold on;
@@ -37,7 +34,6 @@ legend('Відхилення температури', ...
        'Нижня умовна межа', ...
        'Location','best');
 
-%% В'язкість
 subplot(3,1,3);
 plot(t,thermal.viscosityRelative,'LineWidth',1.6);
 hold on;
@@ -51,7 +47,6 @@ legend('За розрахунковою температурою', ...
        'За показанням датчика', ...
        'Location','best');
 
-%% Межі осі часу: від першого до останнього вимірювання
 format_time_axes(fig,t,7);
 
 end

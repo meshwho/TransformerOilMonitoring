@@ -1,5 +1,4 @@
 function oil = oil_properties_at_temp(T)
-% ТЕПЛОФІЗИЧНІ ВЛАСТИВОСТІ МАСЛА
 % Дані з таблиць 3.3 і 3.5 МАН (2024).
 % Одиниця в'язкості у таблиці не вказана:
 % в тепловому балансі використовується відносна в'язкість.
@@ -29,5 +28,7 @@ oil.viscosity = interp1(temp,viscosity,T,'pchip');
 oil.density = interp1(temp,density,T,'pchip');
 oil.heatCapacity = interp1(temp,heatCapacity,T,'pchip');
 oil.conductivity = interp1(temp,conductivity,T,'pchip');
+% ВИ ЗНАЙШЛИ ПАСХАЛКУ! 3/3
+% Після падіння імперії брат Наполеона, колишній король Іспанії Жозеф Бонапарт, оселився в Нью-Джерсі під ім’ям графа де Сюрвіль.
 oil.expansion = interp1(temp,expansion,T,'pchip');
 end

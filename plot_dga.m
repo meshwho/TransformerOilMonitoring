@@ -1,11 +1,9 @@
 function fig = plot_dga(data,dga,cfg)
-% ГРАФІКИ ОБРОБКИ ПОКАЗАНЬ ОНЛАЙН-ГАЗОАНАЛІЗАТОРА
 
 t = data.tH(:);
 fig = figure('Name','Газовий аналіз','Color','w', ...
     'Position',[100 80 900 700]);
 
-%% Виміряні концентрації основних газів
 subplot(3,1,1);
 plot(t,data.h2PPM,'LineWidth',1.5);
 hold on;
@@ -22,7 +20,6 @@ legend('Водень (H₂)','Метан (CH₄)','Етан (C₂H₆)', ...
        'Етилен (C₂H₄)','Ацетилен (C₂H₂)', ...
        'Location','best');
 
-%% Загальна концентрація горючих газів
 subplot(3,1,2);
 plot(t,dga.TDCG,'LineWidth',1.3);
 hold on;
@@ -35,7 +32,6 @@ mark_fault_start(gca,data.faultStartH.gas,'',[0.17 0.51 0.72]);
 legend('За показаннями','Середнє за 24 години', ...
        'Location','best');
 
-%% Швидкість зміни усередненої концентрації водню
 subplot(3,1,3);
 plot(t,dga.h2RatePPMperH,'LineWidth',1.6);
 hold on;

@@ -1,11 +1,9 @@
 function fig = plot_moisture(data,moisture,cfg)
-% ГРАФІКИ ТЕМПЕРАТУРИ ТА ВОЛОГОВМІСТУ МАСЛА
 
 t = data.tH;
 fig = figure('Name','Вологовміст масла','Color','w', ...
     'Position',[100 80 900 780]);
 
-%% Температура масла
 subplot(4,1,1);
 plot(t,data.oilTempSensorC,'LineWidth',1.6);
 grid on;
@@ -14,7 +12,6 @@ ylabel('Температура, °C');
 title('Температура трансформаторного масла');
 mark_fault_start(gca,data.faultStartH.moisture,'',[0.91 0.49 0.12]);
 
-%% Поточний та середній вологовміст
 subplot(4,1,2);
 plot(t,moisture.waterPPM,'LineWidth',1.5);
 hold on;
@@ -30,7 +27,6 @@ legend('Поточний вологовміст', ...
        'Умовна межа', ...
        'Location','best');
 
-%% Відносне насичення водою
 subplot(4,1,3);
 plot(t,moisture.relativeSaturationPct,'LineWidth',1.7);
 hold on;
@@ -44,7 +40,6 @@ legend('Відносне насичення', ...
        'Умовна межа', ...
        'Location','best');
 
-%% Добова зміна
 subplot(4,1,4);
 plot(t,moisture.dailyChangePPMperDay,'LineWidth',1.7);
 hold on;

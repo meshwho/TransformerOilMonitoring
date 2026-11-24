@@ -1,10 +1,7 @@
 function out = model_thermal(data, cfg)
-% НЕЛІНІЙНА ТЕПЛОВА МОДЕЛЬ
-% Масло: рівняння (3.13) МАН, зворотний вплив в'язкості.
 % Гаряча точка: двокомпонентна модель IEC 60076-7.
 % Параметри поки демонстраційні, не калібровані за вимірюваннями.
 
-%% Вхідні дані
 t = data.tH(:);
 K = data.loadPU(:);
 Tamb = data.ambientC(:);
@@ -18,7 +15,6 @@ if any(diff(t) <= 0) || any(~isfinite([t; K; Tamb])) || any(K < 0)
     error('Некоректні вхідні дані теплової моделі.');
 end
 
-%% Ефективність охолодження
 cooling = p.coolingEfficiency;
 if isscalar(cooling)
     cooling = cooling*ones(N,1);
@@ -30,12 +26,10 @@ if length(cooling) ~= N || any(~isfinite(cooling)) || ...
     error('Ефективність охолодження повинна бути в межах (0; 1].');
 end
 
-%% Номінальна в'язкість
 ratedTemp = p.ratedAmbientC+p.topOilRiseC;
 ratedOil = oil_properties_at_temp(ratedTemp);
 muRated = ratedOil.viscosity;
 
-%% Початковий усталений стан
 balance0 = @(T) oil_heat_balance( ...
     T,K(1),Tamb(1),cooling(1),p,muRated);
 
@@ -49,21 +43,18 @@ h1_0 = p.k21*hotRise0;
 h2_0 = (p.k21-1)*hotRise0;
 Y0 = [T0; h1_0; h2_0];
 
-%% Інтегрування диференціальних рівнянь
 maxStep = min(min(diff(t))/2,p.tauWindingH/2);
 options = odeset('RelTol',1e-7,'AbsTol',1e-8,'MaxStep',maxStep);
 
 [~,Y] = ode45(@(time,Y) thermal_equations( ...
     time,Y,t,K,Tamb,cooling,p,muRated),t,Y0,options);
 
-%% Результати розрахунку
 topOilC = Y(:,1);
 hotSpotC = topOilC+Y(:,2)-Y(:,3);
 
 oil = oil_properties_at_temp(topOilC);
 viscosityRelative = oil.viscosity/muRated;
 
-%% Незалежне порівняння з вимірюваннями
 residualC = nan(N,1);
 warning = false(N,1);
 measuredViscosityRelative = nan(N,1);
@@ -89,7 +80,6 @@ out.oilProperties = oil;
 end
 
 function dY = thermal_equations(time,Y,t,K,Tamb,cooling,p,muRated)
-% СИСТЕМА ТРЬОХ ДИФЕРЕНЦІАЛЬНИХ РІВНЯНЬ
 loadNow = interp1(t,K,time,'linear');
 ambientNow = interp1(t,Tamb,time,'linear');
 coolingNow = interp1(t,cooling,time,'linear');
@@ -105,7 +95,6 @@ dY = [dOil; dH1; dH2];
 end
 
 function balance = oil_heat_balance(Toil,K,Tamb,cooling,p,muRated)
-% НЕЛІНІЙНИЙ БАЛАНС З УРАХУВАННЯМ В'ЯЗКОСТІ
 oil = oil_properties_at_temp(Toil);
 muPU = oil.viscosity/muRated;
 

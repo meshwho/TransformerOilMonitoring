@@ -1,5 +1,4 @@
 function state = evaluate_state(thermal,moisture,dga,oil,cfg)
-% КОМПЛЕКСНА ДІАГНОСТИКА ОНЛАЙН-ДАНИХ, ПІДРОЗДІЛ 3.6
 % Без інтегрального бала. Чотири окремі діагностичні канали.
 
 rs = moisture.relativeSaturationPct(:);
@@ -13,7 +12,6 @@ if n < 2 || any([numel(tanRef),numel(kSigma),numel(wThermal),numel(wDGA)] ~= n)
     error('Діагностичні часові ряди мають різну довжину.');
 end
 
-%% Діапазони відносного насичення водою за IEC 60422:2024, додаток B
 goodMax = cfg.referenceRS.goodUpperPct;
 fairMax = cfg.referenceRS.fairUpperPct;
 if goodMax <= 0 || fairMax <= goodMax
@@ -26,7 +24,6 @@ rsBand(validRS & rs >= goodMax & rs <= fairMax) = 2; % Fair
 rsBand(validRS & rs > fairMax) = 3; % Poor: вище 20 %
 % 72 години недостатньо для остаточної класифікації за IEC.
 
-%% Зміна приведеного тангенса втрат (формула 3.24)
 validDielectric = isfinite(tanRef) & tanRef >= 0 & ...
     isfinite(kSigma) & kSigma > 0;
 deltaTan = nan(n,1);
@@ -34,7 +31,6 @@ if validDielectric(1)
     deltaTan(validDielectric) = tanRef(validDielectric)-tanRef(1);
 end
 
-%% Окремі порогові попередження
 % Межі електричних показників є умовними, НЕ нормами IEC.
 if cfg.limits.tanDeltaRef <= 0 || cfg.limits.kSigma <= 0
     error('Демонстраційні діелектричні межі мають бути додатними.');
@@ -49,7 +45,6 @@ state.anyWarning = state.moisture | state.dielectric | state.equipmentWarning;
 state.activeWarnings = double(state.moisture) + double(state.dielectric) + ...
     double(wThermal) + double(wDGA);
 
-%% Дані для підсумкових графіків
 state.relativeSaturationPct = rs;
 state.rsBand = rsBand;
 state.rsGoodUpperPct = goodMax;

@@ -1,7 +1,4 @@
 function oil = model_oil_properties(data,cfg)
-% ТЕПЛОФІЗИЧНІ ВЛАСТИВОСТІ ТА ОБРОБКА ОНЛАЙН-ДІЕЛЕКТРИЧНИХ ВИМІРЮВАНЬ
-% Вхід діелектричного каналу: G (См), C (Ф), температура масла (°C).
-% Формули 3.16-3.20: epsr, sigma, tan(delta), температурна корекція, Ksigma.
 
 T = data.oilTempSensorC(:);
 G = data.oilConductanceS(:);
@@ -12,7 +9,6 @@ if N < 2 || numel(G) ~= N || numel(C) ~= N || ...
     error('Некоректні показання діелектричного датчика.');
 end
 
-%% Теплофізичні властивості за температурою масла
 properties = oil_properties_at_temp(T);
 oil.viscosity = properties.viscosity;
 oil.density = properties.density;
@@ -23,7 +19,6 @@ oil.expansion = properties.expansion;
 oil40 = oil_properties_at_temp(40);
 oil.viscosityRelative = oil.viscosity/oil40.viscosity;
 
-%% Перетворення електричних вимірювань
 p = cfg.oilProperties;
 epsilon0 = 8.8541878128e-12;    % Ф/м
 Cvac = p.vacuumCapacitanceF;     % Ф, калібрувальна ємність
@@ -38,7 +33,6 @@ epsilonRelative = C/Cvac;
 sigma = G*epsilon0/Cvac;
 tanDelta = G./(2*pi*frequency*C);
 
-%% Приведення провідності та проникності до опорної температури
 % Поправка Арреніуса є наближеною та потребує калібрування.
 TK = T+273.15;
 TrefK = p.refTempC+273.15;
@@ -59,10 +53,8 @@ end
 
 tanDeltaRef = sigmaRef./(2*pi*frequency*epsilon0*epsilonRef);
 
-% Відносна зміна відносно першого приведеного вимірювання.
 conditionIndex = sigmaRef/sigmaRef(1);
 
-%% Результати: теплові та електричні характеристики
 oil.temperatureC = T;
 oil.conductanceS = G;
 oil.capacitanceF = C;

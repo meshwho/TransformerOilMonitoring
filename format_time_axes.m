@@ -1,6 +1,4 @@
 function format_time_axes(fig,t,tickCount)
-% МЕЖІ ОСІ ЧАСУ ТА ВІДСТУПИ ДЛЯ ГРАФІКІВ
-% Вісь X закінчується останнім вимірюванням.
 % Вісь Y має запас, щоб лінії не торкалися рамки.
 
 if nargin < 3
@@ -16,15 +14,12 @@ axesList = findall(fig,'Type','axes');
 for k = 1:numel(axesList)
     ax = axesList(k);
 
-    % Межі по часу без порожньої ділянки справа.
     xlim(ax,[t(1),t(end)]);
     xticks(ax,linspace(t(1),t(end),tickCount));
 
-    % Відступи для всіх кривих, включно з умовними межами.
     limits = ylim(ax);
 
     if strcmp(get(ax,'YScale'),'log')
-        % Логарифмічна вісь не допускає від'ємних значень.
         factor = (limits(2)/limits(1))^0.08;
         ylim(ax,[limits(1)/factor,limits(2)*factor]);
     else

@@ -1,8 +1,4 @@
 function out = model_dga(data,cfg)
-% ОБРОБКА ПОКАЗАНЬ ОНЛАЙН-ГАЗОАНАЛІЗАТОРА
-% Формули 3.10-3.15: добові середні, TDCG, швидкості зміни,
-% три співвідношення газів і діагностичні попередження.
-% Газоутворення в трансформаторі тут не моделюється.
 
 t = data.tH(:);
 N = numel(t);
@@ -15,7 +11,6 @@ if N < 2 || any(~isfinite(t)) || any(diff(t) <= 0)
     error('Некоректний часовий ряд газового аналізу.');
 end
 
-%% Виміряні концентрації семи газів, ppm_v
 measured = zeros(N,nGases);
 for i = 1:nGases
     values = data.(gasFields{i})(:);
@@ -46,12 +41,11 @@ C = measured(sampleIndex,:);
 C(~isfinite(C) | C < 0) = nan;
 M = numel(tGas);
 
-%% Сума шести горючих газів: CO2 не враховується
+% Сума шести горючих газів: CO2 не враховується
 TDCG = nan(M,1);
 validTDCG = all(isfinite(C(:,1:6)),2);
 TDCG(validTDCG) = sum(C(validTDCG,1:6),2);
 
-%% Ковзне середнє за повні 24 години (3.10)
 windowH = cfg.dga.averageWindowH;
 lagH = cfg.dga.dailyLagH;
 minSamples = cfg.dga.minReliableSamples;
@@ -82,7 +76,6 @@ for k = 1:M
     end
 end
 
-%% Добова зміна та швидкість зміни концентрацій (3.11)
 dailyChange = nan(M,nGases);
 rate = nan(M,nGases);
 dailyChangeTDCG = nan(M,1);
@@ -107,7 +100,6 @@ for k = 1:M
     rateTDCG(k) = dailyChangeTDCG(k)/lagH;
 end
 
-%% Співвідношення газів (3.12-3.14)
 % Індекси: 1-H2, 2-CH4, 3-C2H6, 4-C2H4, 5-C2H2.
 % Якщо хоча б один газ нижче умовної межі достовірності,
 % співвідношення не інтерпретуємо.
@@ -129,7 +121,6 @@ for j = 1:3
                          average(reliable,denominator);
 end
 
-%% Діагностичне попередження (3.15)
 % Межі демонстраційні, а не нормативні.
 concentrationLimit = cfg.limits.dgaConcentrationPPM(:)';
 rateLimit = cfg.limits.dgaRatePPMperH(:)';
@@ -138,12 +129,11 @@ if numel(concentrationLimit) ~= nGases || numel(rateLimit) ~= nGases
     error('Потрібно задати межі для семи газів.');
 end
 
-highConcentration = bsxfun(@gt,average,concentrationLimit);
-highRate = bsxfun(@gt,rate,rateLimit);
+highConcentration = average > concentrationLimit;
+highRate = rate > rateLimit;
 warningAtSample = any(highConcentration | highRate,2);
 
-%% Утримання останнього результату між циклами вимірювання
-% Всі виходи мають спільну часову сітку з іншими моделями.
+% Утримання останнього результату між циклами вимірювання
 lastSample = zeros(N,1);
 lastSample(sampleIndex) = 1:M;
 lastSample = cummax(lastSample);

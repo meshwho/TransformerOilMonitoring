@@ -1,11 +1,9 @@
 function fig = plot_dielectric_online(data,oil)
-% ЧОТИРИ ГРАФІКИ ОБРОБКИ ОНЛАЙН-ДІЕЛЕКТРИЧНИХ ВИМІРЮВАНЬ
 
 t = data.tH(:);
 fig = figure('Name','Онлайн-моніторинг діелектричних властивостей', ...
     'Color','w','Position',[100 70 920 780]);
 
-%% 1. Температура масла
 subplot(4,1,1);
 plot(t,oil.temperatureC,'LineWidth',1.6);
 grid on;
@@ -14,7 +12,6 @@ ylabel('Температура, °C');
 title('Температура масла за показаннями датчика');
 mark_fault_start(gca,data.faultStartH.dielectric,'',[0.82 0.22 0.24]);
 
-%% 2. Питомa електропровідність
 subplot(4,1,2);
 plot(t,oil.conductivitySperM*1e12,'LineWidth',1.4);
 hold on;
@@ -28,7 +25,6 @@ legend('За поточної температури', ...
        'Приведено до опорної температури', ...
        'Location','best');
 
-%% 3. Тангенс діелектричних втрат
 subplot(4,1,3);
 plot(t,oil.tanDelta,'LineWidth',1.4);
 hold on;
@@ -42,7 +38,6 @@ legend('За поточної температури', ...
        'Приведено до опорної температури', ...
        'Location','best');
 
-%% 4. Відносна зміна приведеної електропровідності
 subplot(4,1,4);
 plot(t,oil.conditionIndex,'LineWidth',1.7);
 hold on;

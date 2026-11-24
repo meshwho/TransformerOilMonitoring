@@ -1,5 +1,4 @@
 function fig = plot_diagnostics(data,state)
-% КОМПАКТНИЙ ПІДСУМКОВИЙ ГРАФІК (ПІДРОЗДІЛ 3.6)
 % Вертикальні пунктири показують початок заданих порушень,
 % а не час першого діагностичного попередження.
 
@@ -7,12 +6,10 @@ t = data.tH(:);
 fig = figure('Name','Комплексний онлайн-моніторинг', ...
     'Color','w','Position',[100 80 820 700]);
 
-% Чотири однакові панелі; знизу залишено місце лише для короткої примітки.
 tl = tiledlayout(fig,4,1,'TileSpacing','compact','Padding','compact');
 tl.Units = 'normalized';
 tl.OuterPosition = [0.075 0.13 0.91 0.85];
 
-%% 1. Відносне насичення водою
 ax1 = nexttile(tl);
 plot(ax1,t,state.relativeSaturationPct,'LineWidth',1.5);
 hold(ax1,'on');
@@ -25,7 +22,6 @@ yline(ax1,state.rsFairUpperPct,'--','20 %', ...
 ylabel(ax1,'RS, %');
 title(ax1,'Відносне насичення водою');
 
-%% 2. Зміна скоригованих діелектричних втрат
 ax2 = nexttile(tl);
 plot(ax2,t,state.deltaTanDeltaRef,'LineWidth',1.5);
 hold(ax2,'on');
@@ -34,17 +30,17 @@ yline(ax2,0,'--','Color',[0.48 0.48 0.48], ...
 ylabel(ax2,'\Delta tg \delta');
 title(ax2,'Зміна діелектричних втрат');
 
-%% 3. Відносна зміна електропровідності
 ax3 = nexttile(tl);
 plot(ax3,t,state.kSigma,'LineWidth',1.5);
 hold(ax3,'on');
 yline(ax3,state.dielectricKLimit,'--','Межа', ...
     'Color',[0.48 0.48 0.48],'FontSize',8, ...
     'LabelHorizontalAlignment','left','LabelVerticalAlignment','bottom');
+% ВИ ЗНАЙШЛИ ПАСХАЛКУ! 2/3
+% На зустріч із Наполеоном до Італії Жозефіна приїхала разом з Іполітом Шарлем, якого вважають її тодішнім коханцем.
 ylabel(ax3,'K_\sigma');
 title(ax3,'Зміна електропровідності');
 
-%% 4. Попередження чотирьох незалежних каналів
 ax4 = nexttile(tl);
 flags = double([state.moisture,state.dielectric, ...
     state.thermal,state.dga])';
@@ -59,7 +55,6 @@ title(ax4,'Попередження (червоний — активне)');
 xlabel(ax4,'Час, год');
 hold(ax4,'on');
 
-%% Однотипні позначки моменту початку несправностей
 starts = [data.faultStartH.dielectric, ...
     data.faultStartH.cooling, ...
     data.faultStartH.moisture, ...
@@ -85,7 +80,6 @@ for j = 1:numel(axesList)
     end
 end
 
-%% Нумерація подій тільки на верхній панелі
 % Цифри розміщено всередині верхньої частини осі, не над заголовком.
 yl = ylim(ax1);
 for i = 1:numel(starts)
@@ -97,7 +91,6 @@ for i = 1:numel(starts)
     end
 end
 
-%% Коротка розшифровка під рисунком (без легенд і декоративних блоків)
 items = {};
 for i = 1:numel(starts)
     if isfinite(starts(i))
